@@ -93,10 +93,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;HAVE_STD_REGEX;HAVE_STEADY_CLOCK;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Git\benchmark\include;C:\Git\benchmark\src;C:\Git\benchmark\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;$(SolutionDir)..\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Git\benchmark\include;C:\Git\benchmark\src;C:\Git\benchmark\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;$(SolutionDir)..\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -129,10 +129,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;HAVE_STD_REGEX;HAVE_STEADY_CLOCK;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Git\benchmark\include;C:\Git\benchmark\src;C:\Git\benchmark\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;$(SolutionDir)..\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Git\benchmark\include;C:\Git\benchmark\src;C:\Git\benchmark\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;$(SolutionDir)..\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -165,10 +165,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;HAVE_STD_REGEX;HAVE_STEADY_CLOCK;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Git\benchmark\include;C:\Git\benchmark\src;C:\Git\benchmark\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;$(SolutionDir)..\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Git\benchmark\include;C:\Git\benchmark\src;C:\Git\benchmark\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;$(SolutionDir)..\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -201,10 +201,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;HAVE_STD_REGEX;HAVE_STEADY_CLOCK;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Git\benchmark\include;C:\Git\benchmark\src;C:\Git\benchmark\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;$(SolutionDir)..\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Git\benchmark\include;C:\Git\benchmark\src;C:\Git\benchmark\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;$(SolutionDir)..\src\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -216,44 +216,44 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Git\benchmark\include\benchmark\benchmark.h" />
-    <ClInclude Include="C:\Git\benchmark\src\arraysize.h" />
-    <ClCompile Include="C:\Git\benchmark\src\benchmark.cc" />
-    <ClCompile Include="C:\Git\benchmark\src\benchmark_api_internal.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\benchmark_api_internal.h" />
-    <ClCompile Include="C:\Git\benchmark\src\benchmark_register.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\benchmark_register.h" />
-    <ClCompile Include="C:\Git\benchmark\src\benchmark_runner.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\benchmark_runner.h" />
-    <ClInclude Include="C:\Git\benchmark\src\check.h" />
-    <ClCompile Include="C:\Git\benchmark\src\colorprint.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\colorprint.h" />
-    <ClCompile Include="C:\Git\benchmark\src\commandlineflags.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\commandlineflags.h" />
-    <ClCompile Include="C:\Git\benchmark\src\complexity.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\complexity.h" />
-    <ClCompile Include="C:\Git\benchmark\src\console_reporter.cc" />
-    <ClCompile Include="C:\Git\benchmark\src\counter.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\counter.h" />
-    <ClCompile Include="C:\Git\benchmark\src\csv_reporter.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\cycleclock.h" />
-    <ClInclude Include="C:\Git\benchmark\src\internal_macros.h" />
-    <ClCompile Include="C:\Git\benchmark\src\json_reporter.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\log.h" />
-    <ClInclude Include="C:\Git\benchmark\src\mutex.h" />
-    <ClInclude Include="C:\Git\benchmark\src\re.h" />
-    <ClCompile Include="C:\Git\benchmark\src\reporter.cc" />
-    <ClCompile Include="C:\Git\benchmark\src\sleep.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\sleep.h" />
-    <ClCompile Include="C:\Git\benchmark\src\statistics.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\statistics.h" />
-    <ClCompile Include="C:\Git\benchmark\src\string_util.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\string_util.h" />
-    <ClCompile Include="C:\Git\benchmark\src\sysinfo.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\thread_manager.h" />
-    <ClInclude Include="C:\Git\benchmark\src\thread_timer.h" />
-    <ClCompile Include="C:\Git\benchmark\src\timers.cc" />
-    <ClInclude Include="C:\Git\benchmark\src\timers.h" />
+    <ClInclude Include="..\..\include\benchmark\benchmark.h" />
+    <ClInclude Include="..\..\src\arraysize.h" />
+    <ClCompile Include="..\..\src\benchmark.cc" />
+    <ClCompile Include="..\..\src\benchmark_api_internal.cc" />
+    <ClInclude Include="..\..\src\benchmark_api_internal.h" />
+    <ClCompile Include="..\..\src\benchmark_register.cc" />
+    <ClInclude Include="..\..\src\benchmark_register.h" />
+    <ClCompile Include="..\..\src\benchmark_runner.cc" />
+    <ClInclude Include="..\..\src\benchmark_runner.h" />
+    <ClInclude Include="..\..\src\check.h" />
+    <ClCompile Include="..\..\src\colorprint.cc" />
+    <ClInclude Include="..\..\src\colorprint.h" />
+    <ClCompile Include="..\..\src\commandlineflags.cc" />
+    <ClInclude Include="..\..\src\commandlineflags.h" />
+    <ClCompile Include="..\..\src\complexity.cc" />
+    <ClInclude Include="..\..\src\complexity.h" />
+    <ClCompile Include="..\..\src\console_reporter.cc" />
+    <ClCompile Include="..\..\src\counter.cc" />
+    <ClInclude Include="..\..\src\counter.h" />
+    <ClCompile Include="..\..\src\csv_reporter.cc" />
+    <ClInclude Include="..\..\src\cycleclock.h" />
+    <ClInclude Include="..\..\src\internal_macros.h" />
+    <ClCompile Include="..\..\src\json_reporter.cc" />
+    <ClInclude Include="..\..\src\log.h" />
+    <ClInclude Include="..\..\src\mutex.h" />
+    <ClInclude Include="..\..\src\re.h" />
+    <ClCompile Include="..\..\src\reporter.cc" />
+    <ClCompile Include="..\..\src\sleep.cc" />
+    <ClInclude Include="..\..\src\sleep.h" />
+    <ClCompile Include="..\..\src\statistics.cc" />
+    <ClInclude Include="..\..\src\statistics.h" />
+    <ClCompile Include="..\..\src\string_util.cc" />
+    <ClInclude Include="..\..\src\string_util.h" />
+    <ClCompile Include="..\..\src\sysinfo.cc" />
+    <ClInclude Include="..\..\src\thread_manager.h" />
+    <ClInclude Include="..\..\src\thread_timer.h" />
+    <ClCompile Include="..\..\src\timers.cc" />
+    <ClInclude Include="..\..\src\timers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

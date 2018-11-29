@@ -1,120 +1,120 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Git\benchmark\src\benchmark.cc">
+    <ClCompile Include="..\..\src\benchmark.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\benchmark_api_internal.cc">
+    <ClCompile Include="..\..\src\benchmark_api_internal.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\benchmark_register.cc">
+    <ClCompile Include="..\..\src\benchmark_register.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\benchmark_runner.cc">
+    <ClCompile Include="..\..\src\benchmark_runner.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\colorprint.cc">
+    <ClCompile Include="..\..\src\colorprint.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\commandlineflags.cc">
+    <ClCompile Include="..\..\src\commandlineflags.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\complexity.cc">
+    <ClCompile Include="..\..\src\complexity.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\console_reporter.cc">
+    <ClCompile Include="..\..\src\console_reporter.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\counter.cc">
+    <ClCompile Include="..\..\src\counter.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\csv_reporter.cc">
+    <ClCompile Include="..\..\src\csv_reporter.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\json_reporter.cc">
+    <ClCompile Include="..\..\src\json_reporter.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\reporter.cc">
+    <ClCompile Include="..\..\src\reporter.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\sleep.cc">
+    <ClCompile Include="..\..\src\sleep.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\statistics.cc">
+    <ClCompile Include="..\..\src\statistics.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\string_util.cc">
+    <ClCompile Include="..\..\src\string_util.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\sysinfo.cc">
+    <ClCompile Include="..\..\src\sysinfo.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Git\benchmark\src\timers.cc">
+    <ClCompile Include="..\..\src\timers.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Git\benchmark\include\benchmark\benchmark.h">
+    <ClInclude Include="..\..\include\benchmark\benchmark.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\arraysize.h">
+    <ClInclude Include="..\..\src\arraysize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\benchmark_api_internal.h">
+    <ClInclude Include="..\..\src\benchmark_api_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\benchmark_register.h">
+    <ClInclude Include="..\..\src\benchmark_register.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\benchmark_runner.h">
+    <ClInclude Include="..\..\src\benchmark_runner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\check.h">
+    <ClInclude Include="..\..\src\check.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\colorprint.h">
+    <ClInclude Include="..\..\src\colorprint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\commandlineflags.h">
+    <ClInclude Include="..\..\src\commandlineflags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\complexity.h">
+    <ClInclude Include="..\..\src\complexity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\counter.h">
+    <ClInclude Include="..\..\src\counter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\cycleclock.h">
+    <ClInclude Include="..\..\src\cycleclock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\internal_macros.h">
+    <ClInclude Include="..\..\src\internal_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\log.h">
+    <ClInclude Include="..\..\src\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\mutex.h">
+    <ClInclude Include="..\..\src\mutex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\re.h">
+    <ClInclude Include="..\..\src\re.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\sleep.h">
+    <ClInclude Include="..\..\src\sleep.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\statistics.h">
+    <ClInclude Include="..\..\src\statistics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\string_util.h">
+    <ClInclude Include="..\..\src\string_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\thread_manager.h">
+    <ClInclude Include="..\..\src\thread_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\thread_timer.h">
+    <ClInclude Include="..\..\src\thread_timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Git\benchmark\src\timers.h">
+    <ClInclude Include="..\..\src\timers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
