@@ -4,6 +4,11 @@ VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "benchmark", "src\benchmark.vcxproj", "{D566DD2D-1EDB-39C4-91A0-DD3863D88E9F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D19A2480-CBC1-416A-AC87-9193062F09D8}"
+	ProjectSection(SolutionItems) = preProject
+		..\Benchmark.autopkg = ..\Benchmark.autopkg
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
