@@ -1,0 +1,68 @@
+configurations {
+   Toolset {
+      key : "PlatformToolset";
+      choices: { v141 };
+   };
+}
+
+nuget
+{
+   nuspec
+   {
+      id = Benchmark;
+      version: 1.4.1.0;
+      title: Google Benchmark Library;
+      authors: { Google };
+      owners: { Google };
+      licenseUrl: "http://www.google.com";
+      projectUrl: "https://github.com/google/benchmark";
+      iconUrl: "http://www.techsmith.com/favicon.ico";
+      requireLicenseAcceptance: false;
+      summary: Google Benchmark library;
+      releaseNotes: "";
+      description: @"A benchmarking library.
+         New features:
+            v 1.4.1 Initial changes
+         Breaking changes:
+         Bug fixes:
+         Misc:
+            "
+
+      copyright: "Copyright 2015 Google Inc. All rights reserved.";
+      tags: { native, utility, vs2017, cpp };
+   };
+
+   files
+   {
+      nestedInclude:  { #destination = ${d_include}Benchmark; Include\Benchmark\*.h };
+      libpdb:         { #destination = ${d_lib}; };
+
+      ("Win32,x64", "v141", "Debug,Release") =>
+      {
+         [${0},${1},${2}]
+         {
+            lib:    { Lib\${0}\${2}\benchmark.lib; }
+            libpdb: { Lib\${0}\${2}\benchmark.pdb; }
+         };
+     };
+   };
+
+   props
+   {
+      // Additional declarations to insert into consuming projects before most of the
+      // project settings. (These may be modified in visual studio by a developer
+      // consuming this package.)
+      // This node is typically not needed for most packages and may be omitted.
+   }
+
+   targets
+   {
+      // Additional declarations to insert into consuming projects after most of the
+      // project settings. (These may NOT be modified in visual studio by a developer
+      // consuming this package.)
+      // This node is often used to set defines that are required that must be set by
+      // the consuming project in order to correctly link to the libraries in this
+      // package.  Such defines may be set either globally or only set under specific
+      // conditions.
+    }
+}
