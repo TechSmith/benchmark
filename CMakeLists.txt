@@ -44,8 +44,8 @@ option(BENCHMARK_ENABLE_LIBPFM "Enable performance counters provided by libpfm" 
 option(BENCHMARK_ENABLE_RUST_BINDINGS "Enable testing of the Rust bindings" OFF)
 
 # Export only public symbols
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+#set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+#set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # As of CMake 3.18, CMAKE_SYSTEM_PROCESSOR is not set properly for MSVC and
