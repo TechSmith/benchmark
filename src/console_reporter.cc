@@ -21,7 +21,9 @@
 #include <tuple>
 #include <vector>
 
-#include "benchmark/benchmark.h"
+#include "benchmark/export.h"
+#include "benchmark/reporter.h"
+#include "benchmark/types.h"
 #include "check.h"
 #include "colorprint.h"
 #include "commandlineflags.h"
@@ -33,6 +35,7 @@
 
 namespace benchmark {
 
+BENCHMARK_EXPORT
 bool ConsoleReporter::ReportContext(const Context& context) {
   name_field_width_ = context.name_field_width;
   printed_header_ = false;
@@ -41,23 +44,28 @@ bool ConsoleReporter::ReportContext(const Context& context) {
   PrintBasicContext(&GetErrorStream(), context);
 
 #ifdef BENCHMARK_OS_WINDOWS
-  if ((output_options_ & OO_Color) && &std::cout != &GetOutputStream()) {
-    GetErrorStream()
-        << "Color printing is only supported for stdout on windows."
-           " Disabling color printing\n";
-    output_options_ = static_cast<OutputOptions>(output_options_ & ~OO_Color);
+  if ((output_options_ & OO_Color)) {
+    auto stdOutBuf = std::cout.rdbuf();
+    auto outStreamBuf = GetOutputStream().rdbuf();
+    if (stdOutBuf != outStreamBuf) {
+      GetErrorStream()
+          << "Color printing is only supported for stdout on windows."
+             " Disabling color printing\n";
+      output_options_ = static_cast<OutputOptions>(output_options_ & ~OO_Color);
+    }
   }
 #endif
 
   return true;
 }
 
+BENCHMARK_EXPORT
 void ConsoleReporter::PrintHeader(const Run& run) {
   std::string str =
       FormatString("%-*s %13s %15s %12s", static_cast<int>(name_field_width_),
                    "Benchmark", "Time", "CPU", "Iterations");
   if (!run.counters.empty()) {
-    if (output_options_ & OO_Tabular) {
+    if ((output_options_ & OO_Tabular) != 0) {
       for (auto const& c : run.counters) {
         str += FormatString(" %10s", c.first.c_str());
       }
@@ -69,6 +77,7 @@ void ConsoleReporter::PrintHeader(const Run& run) {
   GetOutputStream() << line << "\n" << str << "\n" << line << "\n";
 }
 
+BENCHMARK_EXPORT
 void ConsoleReporter::ReportRuns(const std::vector<Run>& reports) {
   for (const auto& run : reports) {
     // print the header:
@@ -76,7 +85,7 @@ void ConsoleReporter::ReportRuns(const std::vector<Run>& reports) {
     bool print_header = !printed_header_;
     // --- or if the format is tabular and this run
     //     has different fields from the prev header
-    print_header |= (output_options_ & OO_Tabular) &&
+    print_header |= ((output_options_ & OO_Tabular) != 0) &&
                     (!internal::SameNames(run.counters, prev_counters_));
     if (print_header) {
       printed_header_ = true;
@@ -90,8 +99,9 @@ void ConsoleReporter::ReportRuns(const std::vector<Run>& reports) {
   }
 }
 
-static void IgnoreColorPrint(std::ostream& out, LogColor, const char* fmt,
-                             ...) {
+PRINTF_FORMAT_STRING_FUNC(3, 4)
+static void IgnoreColorPrint(std::ostream& out, LogColor /*unused*/,
+                             const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);
   out << FormatString(fmt, args);
@@ -112,7 +122,7 @@ static std::string FormatTime(double time) {
   if (time < 100.0) {
     return FormatString("%10.1f", time);
   }
-  // Assuming the time ist at max 9.9999e+99 and we have 10 digits for the
+  // Assuming the time is at max 9.9999e+99 and we have 10 digits for the
   // number, we get 10-1(.)-1(e)-1(sign)-2(exponent) = 5 digits to print.
   if (time > 9999999999 /*max 10 digit number*/) {
     return FormatString("%1.4e", time);
@@ -120,20 +130,26 @@ static std::string FormatTime(double time) {
   return FormatString("%10.0f", time);
 }
 
+BENCHMARK_EXPORT
 void ConsoleReporter::PrintRunData(const Run& result) {
   typedef void(PrinterFn)(std::ostream&, LogColor, const char*, ...);
   auto& Out = GetOutputStream();
-  PrinterFn* printer = (output_options_ & OO_Color)
+  PrinterFn* printer = (output_options_ & OO_Color) != 0
                            ? static_cast<PrinterFn*>(ColorPrintf)
                            : IgnoreColorPrint;
   auto name_color =
       (result.report_big_o || result.report_rms) ? COLOR_BLUE : COLOR_GREEN;
-  printer(Out, name_color, "%-*s ", name_field_width_,
+  printer(Out, name_color, "%-*s ", static_cast<int>(name_field_width_),
           result.benchmark_name().c_str());
 
-  if (result.error_occurred) {
+  if (internal::SkippedWithError == result.skipped) {
     printer(Out, COLOR_RED, "ERROR OCCURRED: \'%s\'",
-            result.error_message.c_str());
+            result.skip_message.c_str());
+    printer(Out, COLOR_DEFAULT, "\n");
+    return;
+  }
+  if (internal::SkippedWithMessage == result.skipped) {
+    printer(Out, COLOR_WHITE, "SKIPPED: \'%s\'", result.skip_message.c_str());
     printer(Out, COLOR_DEFAULT, "\n");
     return;
   }
@@ -166,9 +182,9 @@ void ConsoleReporter::PrintRunData(const Run& result) {
     printer(Out, COLOR_CYAN, "%10lld", result.iterations);
   }
 
-  for (auto& c : result.counters) {
+  for (const auto& c : result.counters) {
     const std::size_t cNameLen =
-        std::max(std::string::size_type(10), c.first.length());
+        std::max(static_cast<std::size_t>(10), c.first.length());
     std::string s;
     const char* unit = "";
     if (result.run_type == Run::RT_Aggregate &&
@@ -177,12 +193,13 @@ void ConsoleReporter::PrintRunData(const Run& result) {
       unit = "%";
     } else {
       s = HumanReadableNumber(c.second.value, c.second.oneK);
-      if (c.second.flags & Counter::kIsRate)
-        unit = (c.second.flags & Counter::kInvert) ? "s" : "/s";
+      if ((c.second.flags & Counter::kIsRate) != 0) {
+        unit = (c.second.flags & Counter::kInvert) != 0 ? "s" : "/s";
+      }
     }
-    if (output_options_ & OO_Tabular) {
-      printer(Out, COLOR_DEFAULT, " %*s%s", cNameLen - strlen(unit), s.c_str(),
-              unit);
+    if ((output_options_ & OO_Tabular) != 0) {
+      printer(Out, COLOR_DEFAULT, " %*s%s",
+              static_cast<int>(cNameLen - strlen(unit)), s.c_str(), unit);
     } else {
       printer(Out, COLOR_DEFAULT, " %s=%s%s", c.first.c_str(), s.c_str(), unit);
     }

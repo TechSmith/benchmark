@@ -3,8 +3,12 @@
 #include <set>
 #include <vector>
 
-#include "benchmark/benchmark.h"
+#include "benchmark/benchmark_api.h"
+#include "benchmark/registration.h"
+#include "benchmark/state.h"
+#include "benchmark/utils.h"
 
+namespace {
 class MultipleRangesFixture : public ::benchmark::Fixture {
  public:
   MultipleRangesFixture()
@@ -28,7 +32,7 @@ class MultipleRangesFixture : public ::benchmark::Fixture {
                         {2, 7, 15},
                         {7, 6, 3}}) {}
 
-  void SetUp(const ::benchmark::State& state) BENCHMARK_OVERRIDE {
+  void SetUp(const ::benchmark::State& state) override {
     std::vector<int64_t> ranges = {state.range(0), state.range(1),
                                    state.range(2)};
 
@@ -39,7 +43,7 @@ class MultipleRangesFixture : public ::benchmark::Fixture {
 
   // NOTE: This is not TearDown as we want to check after _all_ runs are
   // complete.
-  virtual ~MultipleRangesFixture() {
+  ~MultipleRangesFixture() override {
     if (actualValues != expectedValues) {
       std::cout << "EXPECTED\n";
       for (const auto& v : expectedValues) {
@@ -87,10 +91,11 @@ void BM_CheckDefaultArgument(benchmark::State& state) {
 }
 BENCHMARK(BM_CheckDefaultArgument)->Ranges({{1, 5}, {6, 10}});
 
-static void BM_MultipleRanges(benchmark::State& st) {
+void BM_MultipleRanges(benchmark::State& st) {
   for (auto _ : st) {
   }
 }
 BENCHMARK(BM_MultipleRanges)->Ranges({{5, 5}, {6, 6}});
+}  // end namespace
 
 BENCHMARK_MAIN();

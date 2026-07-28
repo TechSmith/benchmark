@@ -21,7 +21,8 @@
 #include <string>
 #include <vector>
 
-#include "benchmark/benchmark.h"
+#include "benchmark/reporter.h"
+#include "benchmark/statistics.h"
 
 namespace benchmark {
 
@@ -31,7 +32,7 @@ std::vector<BenchmarkReporter::Run> ComputeBigO(
     const std::vector<BenchmarkReporter::Run>& reports);
 
 // This data structure will contain the result returned by MinimalLeastSq
-//   - coef        : Estimated coeficient for the high-order term as
+//   - coef        : Estimated coefficient for the high-order term as
 //                   interpolated from data.
 //   - rms         : Normalized Root Mean Squared Error.
 //   - complexity  : Scalability form (e.g. oN, oNLogN). In case a scalability

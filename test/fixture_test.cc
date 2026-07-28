@@ -2,27 +2,29 @@
 #include <cassert>
 #include <memory>
 
-#include "benchmark/benchmark.h"
+#include "benchmark/benchmark_api.h"
+#include "benchmark/registration.h"
+#include "benchmark/state.h"
 
 #define FIXTURE_BECHMARK_NAME MyFixture
 
 class FIXTURE_BECHMARK_NAME : public ::benchmark::Fixture {
  public:
-  void SetUp(const ::benchmark::State& state) BENCHMARK_OVERRIDE {
+  void SetUp(const ::benchmark::State& state) override {
     if (state.thread_index() == 0) {
       assert(data.get() == nullptr);
       data.reset(new int(42));
     }
   }
 
-  void TearDown(const ::benchmark::State& state) BENCHMARK_OVERRIDE {
+  void TearDown(const ::benchmark::State& state) override {
     if (state.thread_index() == 0) {
       assert(data.get() != nullptr);
       data.reset();
     }
   }
 
-  ~FIXTURE_BECHMARK_NAME() { assert(data == nullptr); }
+  ~FIXTURE_BECHMARK_NAME() override { assert(data == nullptr); }
 
   std::unique_ptr<int> data;
 };

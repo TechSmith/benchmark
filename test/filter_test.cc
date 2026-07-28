@@ -8,17 +8,20 @@
 #include <sstream>
 #include <string>
 
-#include "benchmark/benchmark.h"
+#include "benchmark/benchmark_api.h"
+#include "benchmark/registration.h"
+#include "benchmark/reporter.h"
+#include "benchmark/state.h"
 
 namespace {
 
 class TestReporter : public benchmark::ConsoleReporter {
  public:
-  virtual bool ReportContext(const Context& context) BENCHMARK_OVERRIDE {
+  bool ReportContext(const Context& context) override {
     return ConsoleReporter::ReportContext(context);
   };
 
-  virtual void ReportRuns(const std::vector<Run>& report) BENCHMARK_OVERRIDE {
+  void ReportRuns(const std::vector<Run>& report) override {
     ++count_;
     max_family_index_ = std::max(max_family_index_, report[0].family_index);
     ConsoleReporter::ReportRuns(report);
@@ -26,7 +29,7 @@ class TestReporter : public benchmark::ConsoleReporter {
 
   TestReporter() : count_(0), max_family_index_(0) {}
 
-  virtual ~TestReporter() {}
+  ~TestReporter() override {}
 
   int GetCount() const { return count_; }
 
@@ -37,43 +40,45 @@ class TestReporter : public benchmark::ConsoleReporter {
   mutable int64_t max_family_index_;
 };
 
-}  // end namespace
-
-static void NoPrefix(benchmark::State& state) {
+void NoPrefix(benchmark::State& state) {
   for (auto _ : state) {
   }
 }
 BENCHMARK(NoPrefix);
 
-static void BM_Foo(benchmark::State& state) {
+void BM_Foo(benchmark::State& state) {
   for (auto _ : state) {
   }
 }
 BENCHMARK(BM_Foo);
 
-static void BM_Bar(benchmark::State& state) {
+void BM_Bar(benchmark::State& state) {
   for (auto _ : state) {
   }
 }
 BENCHMARK(BM_Bar);
 
-static void BM_FooBar(benchmark::State& state) {
+void BM_FooBar(benchmark::State& state) {
   for (auto _ : state) {
   }
 }
 BENCHMARK(BM_FooBar);
 
-static void BM_FooBa(benchmark::State& state) {
+void BM_FooBa(benchmark::State& state) {
   for (auto _ : state) {
   }
 }
 BENCHMARK(BM_FooBa);
+}  // end namespace
 
 int main(int argc, char** argv) {
+  benchmark::MaybeReenterWithoutASLR(argc, argv);
+
   bool list_only = false;
-  for (int i = 0; i < argc; ++i)
+  for (int i = 0; i < argc; ++i) {
     list_only |= std::string(argv[i]).find("--benchmark_list_tests") !=
                  std::string::npos;
+  }
 
   benchmark::Initialize(&argc, argv);
 
@@ -84,13 +89,13 @@ int main(int argc, char** argv) {
   if (argc == 2) {
     // Make sure we ran all of the tests
     std::stringstream ss(argv[1]);
-    int64_t expected_return;
+    int64_t expected_return = 0;
     ss >> expected_return;
 
     if (returned_count != expected_return) {
       std::cerr << "ERROR: Expected " << expected_return
                 << " tests to match the filter but returned_count = "
-                << returned_count << std::endl;
+                << returned_count << '\n';
       return -1;
     }
 
@@ -99,7 +104,7 @@ int main(int argc, char** argv) {
     if (reports_count != expected_reports) {
       std::cerr << "ERROR: Expected " << expected_reports
                 << " tests to be run but reported_count = " << reports_count
-                << std::endl;
+                << '\n';
       return -1;
     }
 
@@ -108,7 +113,7 @@ int main(int argc, char** argv) {
     if (num_families != expected_reports) {
       std::cerr << "ERROR: Expected " << expected_reports
                 << " test families to be run but num_families = "
-                << num_families << std::endl;
+                << num_families << '\n';
       return -1;
     }
   }

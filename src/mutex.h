@@ -3,6 +3,9 @@
 
 #include <condition_variable>
 #include <mutex>
+#if defined(__clang__) && !defined(_WIN32)
+#include <pthread.h>
+#endif
 
 #include "check.h"
 
@@ -76,8 +79,20 @@ class CAPABILITY("mutex") Mutex {
  public:
   Mutex() {}
 
-  void lock() ACQUIRE() { mut_.lock(); }
-  void unlock() RELEASE() { mut_.unlock(); }
+  void lock() ACQUIRE() {
+#if defined(__clang__) && !defined(_WIN32)
+    pthread_mutex_lock(mut_.native_handle());
+#else
+    mut_.lock();
+#endif
+  }
+  void unlock() RELEASE() {
+#if defined(__clang__) && !defined(_WIN32)
+    pthread_mutex_unlock(mut_.native_handle());
+#else
+    mut_.unlock();
+#endif
+  }
   std::mutex& native_handle() { return mut_; }
 
  private:

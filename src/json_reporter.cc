@@ -22,16 +22,16 @@
 #include <tuple>
 #include <vector>
 
-#include "benchmark/benchmark.h"
+#include "benchmark/benchmark_api.h"
+#include "benchmark/export.h"
+#include "benchmark/reporter.h"
+#include "benchmark/types.h"
+#include "benchmark_api_internal.h"
 #include "complexity.h"
 #include "string_util.h"
 #include "timers.h"
 
 namespace benchmark {
-namespace internal {
-extern std::map<std::string, std::string>* global_context;
-}
-
 namespace {
 
 std::string StrEscape(const std::string& s) {
@@ -85,19 +85,25 @@ std::string FormatKV(std::string const& key, bool value) {
 
 std::string FormatKV(std::string const& key, int64_t value) {
   std::stringstream ss;
-  ss << '"' << StrEscape(key) << "\": " << value;
+  // We really want to just dump the integer as-is,
+  // without the system locale interfering.
+  ss << '"' << StrEscape(key) << "\": " << std::to_string(value);
   return ss.str();
+}
+
+std::string FormatKV(std::string const& key, int value) {
+  return FormatKV(key, static_cast<int64_t>(value));
 }
 
 std::string FormatKV(std::string const& key, double value) {
   std::stringstream ss;
   ss << '"' << StrEscape(key) << "\": ";
 
-  if (std::isnan(value))
+  if (std::isnan(value)) {
     ss << (value < 0 ? "-" : "") << "NaN";
-  else if (std::isinf(value))
+  } else if (std::isinf(value)) {
     ss << (value < 0 ? "-" : "") << "Infinity";
-  else {
+  } else {
     const auto max_digits10 =
         std::numeric_limits<decltype(value)>::max_digits10;
     const auto max_fractional_digits10 = max_digits10 - 1;
@@ -126,7 +132,7 @@ bool JSONReporter::ReportContext(const Context& context) {
 
   out << indent << FormatKV("host_name", context.sys_info.name) << ",\n";
 
-  if (Context::executable_name) {
+  if (Context::executable_name != nullptr) {
     out << indent << FormatKV("executable", Context::executable_name) << ",\n";
   }
 
@@ -140,7 +146,15 @@ bool JSONReporter::ReportContext(const Context& context) {
   if (CPUInfo::Scaling::UNKNOWN != info.scaling) {
     out << indent
         << FormatKV("cpu_scaling_enabled",
-                    info.scaling == CPUInfo::Scaling::ENABLED ? true : false)
+                    info.scaling == CPUInfo::Scaling::ENABLED)
+        << ",\n";
+  }
+
+  const SystemInfo& sysinfo = context.sys_info;
+  if (SystemInfo::ASLR::UNKNOWN != sysinfo.ASLRStatus) {
+    out << indent
+        << FormatKV("aslr_enabled",
+                    sysinfo.ASLRStatus == SystemInfo::ASLR::ENABLED)
         << ",\n";
   }
 
@@ -148,7 +162,7 @@ bool JSONReporter::ReportContext(const Context& context) {
   indent = std::string(6, ' ');
   std::string cache_indent(8, ' ');
   for (size_t i = 0; i < info.caches.size(); ++i) {
-    auto& CI = info.caches[i];
+    const auto& CI = info.caches[i];
     out << indent << "{\n";
     out << cache_indent << FormatKV("type", CI.type) << ",\n";
     out << cache_indent << FormatKV("level", static_cast<int64_t>(CI.level))
@@ -159,7 +173,9 @@ bool JSONReporter::ReportContext(const Context& context) {
         << FormatKV("num_sharing", static_cast<int64_t>(CI.num_sharing))
         << "\n";
     out << indent << "}";
-    if (i != info.caches.size() - 1) out << ",";
+    if (i != info.caches.size() - 1) {
+      out << ",";
+    }
     out << "\n";
   }
   indent = std::string(4, ' ');
@@ -167,9 +183,14 @@ bool JSONReporter::ReportContext(const Context& context) {
   out << indent << "\"load_avg\": [";
   for (auto it = info.load_avg.begin(); it != info.load_avg.end();) {
     out << *it++;
-    if (it != info.load_avg.end()) out << ",";
+    if (it != info.load_avg.end()) {
+      out << ",";
+    }
   }
   out << "],\n";
+
+  out << indent << FormatKV("library_version", GetBenchmarkVersion());
+  out << ",\n";
 
 #if defined(NDEBUG)
   const char build_type[] = "release";
@@ -177,9 +198,16 @@ bool JSONReporter::ReportContext(const Context& context) {
   const char build_type[] = "debug";
 #endif
   out << indent << FormatKV("library_build_type", build_type);
+  out << ",\n";
 
-  if (internal::global_context != nullptr) {
-    for (const auto& kv : *internal::global_context) {
+  // NOTE: our json schema is not strictly tied to the library version!
+  out << indent << FormatKV("json_schema_version", 1);
+
+  std::map<std::string, std::string>* global_context =
+      internal::GetGlobalContext();
+
+  if (global_context != nullptr) {
+    for (const auto& kv : *global_context) {
       out << ",\n";
       out << indent << FormatKV(kv.first, kv.second);
     }
@@ -255,9 +283,12 @@ void JSONReporter::PrintRunData(Run const& run) {
       BENCHMARK_UNREACHABLE();
     }()) << ",\n";
   }
-  if (run.error_occurred) {
-    out << indent << FormatKV("error_occurred", run.error_occurred) << ",\n";
-    out << indent << FormatKV("error_message", run.error_message) << ",\n";
+  if (internal::SkippedWithError == run.skipped) {
+    out << indent << FormatKV("error_occurred", true) << ",\n";
+    out << indent << FormatKV("error_message", run.skip_message) << ",\n";
+  } else if (internal::SkippedWithMessage == run.skipped) {
+    out << indent << FormatKV("skipped", true) << ",\n";
+    out << indent << FormatKV("skip_message", run.skip_message) << ",\n";
   }
   if (!run.report_big_o && !run.report_rms) {
     out << indent << FormatKV("iterations", run.iterations) << ",\n";
@@ -285,19 +316,21 @@ void JSONReporter::PrintRunData(Run const& run) {
     out << indent << FormatKV("rms", run.GetAdjustedCPUTime());
   }
 
-  for (auto& c : run.counters) {
+  for (const auto& c : run.counters) {
     out << ",\n" << indent << FormatKV(c.first, c.second);
   }
 
-  if (run.memory_result) {
-    const MemoryManager::Result memory_result = *run.memory_result;
+  if (run.memory_result.memory_iterations > 0) {
+    const auto& memory_result = run.memory_result;
     out << ",\n" << indent << FormatKV("allocs_per_iter", run.allocs_per_iter);
     out << ",\n"
         << indent << FormatKV("max_bytes_used", memory_result.max_bytes_used);
 
-    auto report_if_present = [&out, &indent](const char* label, int64_t val) {
-      if (val != MemoryManager::TombstoneValue)
+    auto report_if_present = [&out, &indent](const std::string& label,
+                                             int64_t val) {
+      if (val != MemoryManager::TombstoneValue) {
         out << ",\n" << indent << FormatKV(label, val);
+      }
     };
 
     report_if_present("total_allocated_bytes",
@@ -311,7 +344,24 @@ void JSONReporter::PrintRunData(Run const& run) {
   out << '\n';
 }
 
-const int64_t MemoryManager::TombstoneValue =
-    std::numeric_limits<int64_t>::max();
+void JSONReporter::List(
+    const std::vector<internal::BenchmarkInstance>& benchmarks) {
+  std::ostream& out = GetOutputStream();
+  std::string inner_indent(2, ' ');
+  std::string indent(4, ' ');
+  std::string entry_indent(6, ' ');
+
+  // Mirror the structure of the regular output so that consumers can read
+  // the names from the same "benchmarks" array in both modes.
+  out << "{\n" << inner_indent << "\"benchmarks\": [";
+  bool first = true;
+  for (const internal::BenchmarkInstance& benchmark : benchmarks) {
+    out << (first ? "\n" : ",\n") << indent << "{\n";
+    out << entry_indent << FormatKV("name", benchmark.name().str()) << "\n";
+    out << indent << "}";
+    first = false;
+  }
+  out << "\n" << inner_indent << "]\n}\n";
+}
 
 }  // end namespace benchmark

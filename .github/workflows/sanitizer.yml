@@ -4,22 +4,27 @@ on:
   push: {}
   pull_request: {}
 
+permissions:
+  contents: read
+
 env:
+  CMAKE_GENERATOR: Ninja
   UBSAN_OPTIONS: "print_stacktrace=1"
 
 jobs:
   job:
-    name: ${{ matrix.sanitizer }}.${{ matrix.build_type }}.${{ matrix.compiler }}
+    name: ${{ matrix.sanitizer }}.${{ matrix.build_type }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         build_type: ['Debug', 'RelWithDebInfo']
-        sanitizer: ['asan', 'ubsan', 'tsan']
-        compiler: ['clang', 'gcc']
-        # TODO: add 'msan' above. currently failing and needs investigation.
+        sanitizer: ['asan', 'ubsan', 'tsan', 'msan']
+
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - name: configure msan env
       if: matrix.sanitizer == 'msan'
@@ -45,40 +50,47 @@ jobs:
         echo "EXTRA_FLAGS=-g -O2 -fno-omit-frame-pointer -fsanitize=thread -fno-sanitize-recover=all" >> $GITHUB_ENV
         echo "LIBCXX_SANITIZER=Thread" >> $GITHUB_ENV
 
+    - name: fine-tune asan options
+      # in asan we get an error from std::regex. ignore it.
+      if: matrix.sanitizer == 'asan'
+      run: |
+        echo "ASAN_OPTIONS=alloc_dealloc_mismatch=0" >> $GITHUB_ENV
+
+    - name: setup clang
+      uses: egor-tensin/setup-clang@23bc15cd4207e45f1566447deb48f4ff3ef932cb # v2.3
+      with:
+        version: latest
+        platform: x64
+
     - name: configure clang
-      if: matrix.compiler == 'clang'
       run: |
-        echo "CC=clang" >> $GITHUB_ENV
-        echo "CXX=clang++" >> $GITHUB_ENV
+        echo "CC=cc" >> $GITHUB_ENV
+        echo "CXX=c++" >> $GITHUB_ENV
 
-    - name: configure gcc
-      if: matrix.compiler == 'gcc'
+    - name: build libc++ (non-asan)
+      if: matrix.sanitizer != 'asan'
       run: |
-        sudo apt update && sudo apt -y install gcc-10 g++-10
-        echo "CC=gcc-10" >> $GITHUB_ENV
-        echo "CXX=g++-10" >> $GITHUB_ENV
-
-    - name: install llvm stuff
-      if: matrix.compiler == 'clang'
-      run: |
-        "${GITHUB_WORKSPACE}/.github/.libcxx-setup.sh"
-        echo "EXTRA_CXX_FLAGS=\"-stdlib=libc++\"" >> $GITHUB_ENV
+        "${GITHUB_WORKSPACE}/.github/libcxx-setup.sh"
+        echo "EXTRA_CXX_FLAGS=-stdlib=libc++ -L${GITHUB_WORKSPACE}/llvm-build/lib -lc++abi -I${GITHUB_WORKSPACE}/llvm-build/include/c++/v1 -Isystem${GITHUB_WORKSPACE}/llvm-build/include/c++/v1 -Wl,-rpath,${GITHUB_WORKSPACE}/llvm-build/lib" >> $GITHUB_ENV
 
     - name: create build environment
-      run: cmake -E make_directory ${{ runner.workspace }}/_build
+      run: cmake -E make_directory ${RUNNER_WORKSPACE}/_build
+      env:
+        RUNNER_WORKSPACE: ${{ runner.workspace }}
 
     - name: configure cmake
       shell: bash
       working-directory: ${{ runner.workspace }}/_build
       run: >
-        cmake $GITHUB_WORKSPACE
+        VERBOSE=1
+        cmake -GNinja $GITHUB_WORKSPACE
         -DBENCHMARK_ENABLE_ASSEMBLY_TESTS=OFF
         -DBENCHMARK_ENABLE_LIBPFM=OFF
         -DBENCHMARK_DOWNLOAD_DEPENDENCIES=ON
-        -DCMAKE_C_COMPILER=${{ env.CC }}
-        -DCMAKE_CXX_COMPILER=${{ env.CXX }}
-        -DCMAKE_C_FLAGS="${{ env.EXTRA_FLAGS }}"
-        -DCMAKE_CXX_FLAGS="${{ env.EXTRA_FLAGS }} ${{ env.EXTRA_CXX_FLAGS }}"
+        -DCMAKE_C_COMPILER=${CC}
+        -DCMAKE_CXX_COMPILER=${CXX}
+        -DCMAKE_C_FLAGS="${EXTRA_FLAGS}"
+        -DCMAKE_CXX_FLAGS="${EXTRA_FLAGS} ${EXTRA_CXX_FLAGS}"
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
     - name: build

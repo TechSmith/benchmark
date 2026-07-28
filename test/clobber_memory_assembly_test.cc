@@ -1,8 +1,10 @@
-#include <benchmark/benchmark.h>
+#include "benchmark/macros.h"
+#include "benchmark/utils.h"
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wreturn-type"
 #endif
+BENCHMARK_DISABLE_DEPRECATED_WARNING
 
 extern "C" {
 

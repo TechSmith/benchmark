@@ -10,7 +10,7 @@ platform(
 TEST_COPTS = [
     "-pedantic",
     "-pedantic-errors",
-    "-std=c++11",
+    "-std=c++17",
     "-Wall",
     "-Wconversion",
     "-Wextra",
@@ -18,6 +18,14 @@ TEST_COPTS = [
     #    "-Wshorten-64-to-32",
     "-Wfloat-equal",
     "-fstrict-aliasing",
+    ## assert() are used a lot in tests upstream, which may be optimised out leading to
+    ## unused-variable warning.
+    "-Wno-unused-variable",
+    "-Werror=old-style-cast",
+]
+
+TEST_MSVC_OPTS = [
+    "/std:c++17",
 ]
 
 # Some of the issues with DoNotOptimize only occur when optimization is enabled
@@ -25,14 +33,20 @@ PER_SRC_COPTS = {
     "donotoptimize_test.cc": ["-O3"],
 }
 
-TEST_ARGS = ["--benchmark_min_time=0.01"]
+TEST_ARGS = ["--benchmark_min_time=0.01s"]
 
-PER_SRC_TEST_ARGS = ({
-    "user_counters_tabular_test.cc": ["--benchmark_counters_tabular=true"],
+PER_SRC_TEST_ARGS = {
+    "user_counters_tabular_test.cc": [
+        "--benchmark_counters_tabular=true",
+        "--benchmark_min_time=0.2s",
+    ],
     "repetitions_test.cc": [" --benchmark_repetitions=3"],
-    "spec_arg_test.cc" : ["--benchmark_filter=BM_NotChosen"],
-    "spec_arg_verbosity_test.cc" : ["--v=42"],
-})
+    "spec_arg_test.cc": ["--benchmark_filter=BM_NotChosen"],
+    "spec_arg_verbosity_test.cc": ["--v=42"],
+    "complexity_test.cc": ["--benchmark_min_time=1000000x"],
+    "user_counters_test.cc": ["--benchmark_min_time=0.2s"],
+    "user_counters_threads_test.cc": ["--benchmark_min_time=0.2s"],
+}
 
 cc_library(
     name = "output_test_helper",
@@ -40,7 +54,7 @@ cc_library(
     srcs = ["output_test_helper.cc"],
     hdrs = ["output_test.h"],
     copts = select({
-        "//:windows": [],
+        "//:windows": TEST_MSVC_OPTS,
         "//conditions:default": TEST_COPTS,
     }),
     deps = [
@@ -49,6 +63,27 @@ cc_library(
     ],
 )
 
+# Tests that use gtest.  These rely on `gtest_main`.
+[
+    cc_test(
+        name = test_src[:-len(".cc")],
+        size = "small",
+        srcs = [test_src],
+        copts = select({
+            "//:windows": TEST_MSVC_OPTS,
+            "//conditions:default": TEST_COPTS,
+        }) + PER_SRC_COPTS.get(test_src, []),
+        deps = [
+            "//:benchmark",
+            "//:benchmark_internal_headers",
+            "@com_google_googletest//:gtest",
+            "@com_google_googletest//:gtest_main",
+        ],
+    )
+    for test_src in glob(["*_gtest.cc"])
+]
+
+# Tests that do not use gtest.  These have their own `main` defined.
 [
     cc_test(
         name = test_src[:-len(".cc")],
@@ -56,46 +91,41 @@ cc_library(
         srcs = [test_src],
         args = TEST_ARGS + PER_SRC_TEST_ARGS.get(test_src, []),
         copts = select({
-            "//:windows": [],
+            "//:windows": TEST_MSVC_OPTS,
             "//conditions:default": TEST_COPTS,
-        }) + PER_SRC_COPTS.get(test_src, []) ,
+        }) + PER_SRC_COPTS.get(test_src, []),
         deps = [
             ":output_test_helper",
             "//:benchmark",
             "//:benchmark_internal_headers",
-            "@com_google_googletest//:gtest",
-            "@com_google_googletest//:gtest_main",
-        ]
+        ],
         # FIXME: Add support for assembly tests to bazel.
         # See Issue #556
         # https://github.com/google/benchmark/issues/556
     )
     for test_src in glob(
-        ["*test.cc"],
+        ["*_test.cc"],
         exclude = [
             "*_assembly_test.cc",
-            "cxx03_test.cc",
+            "cxx11_test.cc",
             "link_main_test.cc",
         ],
     )
 ]
 
 cc_test(
-    name = "cxx03_test",
+    name = "cxx11_test",
     size = "small",
-    srcs = ["cxx03_test.cc"],
-    copts = TEST_COPTS + ["-std=c++03"],
-    deps = [
-        ":output_test_helper",
-        "//:benchmark",
-        "//:benchmark_internal_headers",
-        "@com_google_googletest//:gtest",
-        "@com_google_googletest//:gtest_main",
-    ],
+    srcs = ["cxx11_test.cc"],
+    copts = TEST_COPTS + ["-std=c++11"],
     target_compatible_with = select({
         "//:windows": ["@platforms//:incompatible"],
         "//conditions:default": [],
-    })
+    }),
+    deps = [
+        ":output_test_helper",
+        "//:benchmark_main",
+    ],
 )
 
 cc_test(
@@ -103,7 +133,7 @@ cc_test(
     size = "small",
     srcs = ["link_main_test.cc"],
     copts = select({
-        "//:windows": [],
+        "//:windows": TEST_MSVC_OPTS,
         "//conditions:default": TEST_COPTS,
     }),
     deps = ["//:benchmark_main"],
